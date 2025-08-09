@@ -11,14 +11,14 @@ let autoSpinActive = false;
 // DOM elements
 const creditsEl = document.getElementById("credits");
 const betEl = document.getElementById("bet");
-const reelsEls = document.querySelectorAll(".reel");
+const reelsEls = document.querySelectorAll(".reel .symbols"); // Fix: select .symbols inside each .reel
 const spinBtn = document.getElementById("spinBtn");
 const autoSpinBtn = document.getElementById("autoSpinBtn");
-const betPlusBtn = document.getElementById("betPlus");
-const betMinusBtn = document.getElementById("betMinus");
-const resultModal = document.getElementById("resultModal");
-const resultText = document.getElementById("resultText");
-const closeModalBtn = document.querySelector(".close");
+
+// Since betPlus and betMinus buttons don't exist in your HTML, remove related code
+
+// Add message area instead of modal (since modal missing in your HTML)
+const messageEl = document.getElementById("message");
 
 // Update display
 function updateUI() {
@@ -26,30 +26,39 @@ function updateUI() {
     betEl.textContent = bet;
 }
 
+// Show message
+function showMessage(text) {
+    messageEl.textContent = text;
+    setTimeout(() => {
+        messageEl.textContent = "";
+    }, 3000); // clear message after 3 seconds
+}
+
 // Spin logic
 function spin() {
     if (credits < bet) {
-        showResult("Not enough credits!");
+        showMessage("❌ Not enough credits!");
         autoSpinActive = false;
+        autoSpinBtn.textContent = "Auto Spin: OFF";
         return;
     }
 
     credits -= bet;
 
     let reelResults = [];
-    reelsEls.forEach((reel, index) => {
+    reelsEls.forEach((symbolsContainer) => {
         const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-        reel.textContent = symbol;
+        symbolsContainer.textContent = symbol;
         reelResults.push(symbol);
     });
 
-    // Check win
+    // Check win: all symbols same
     if (reelResults.every(symbol => symbol === reelResults[0])) {
         const payout = bet * 10;
         credits += payout;
-        showResult(`🎉 Jackpot! You win ${payout} credits! 🎉`);
+        showMessage(`🎉 Jackpot! You win ${payout} credits! 🎉`);
     } else {
-        showResult("❌ Try Again!");
+        showMessage("❌ Try Again!");
     }
 
     updateUI();
@@ -58,7 +67,7 @@ function spin() {
 // Auto Spin logic
 function toggleAutoSpin() {
     autoSpinActive = !autoSpinActive;
-    autoSpinBtn.textContent = autoSpinActive ? "Stop Auto Spin" : "Auto Spin";
+    autoSpinBtn.textContent = autoSpinActive ? "Stop Auto Spin" : "Auto Spin: OFF";
 
     if (autoSpinActive) {
         autoSpin();
@@ -71,35 +80,9 @@ function autoSpin() {
     setTimeout(autoSpin, 1000); // spin every second
 }
 
-// Result modal
-function showResult(message) {
-    resultText.textContent = message;
-    resultModal.style.display = "block";
-}
-
 // Event listeners
 spinBtn.addEventListener("click", spin);
 autoSpinBtn.addEventListener("click", toggleAutoSpin);
 
-betPlusBtn.addEventListener("click", () => {
-    bet += 10;
-    updateUI();
-});
-
-betMinusBtn.addEventListener("click", () => {
-    if (bet > 10) bet -= 10;
-    updateUI();
-});
-
-closeModalBtn.addEventListener("click", () => {
-    resultModal.style.display = "none";
-});
-
-window.addEventListener("click", (event) => {
-    if (event.target == resultModal) {
-        resultModal.style.display = "none";
-    }
-});
-
-// Init
+// Init UI
 updateUI();
