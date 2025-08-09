@@ -31,6 +31,32 @@ main {
   padding: 20px;
   box-shadow: 0 0 40px #3ea53e;
 }
+
+/* Added for logo container and image */
+#slot-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#fruitLogo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 10px;
+  user-select: none;
+}
+
+#info {
+  font-size: 18px;
+  margin-bottom: 15px;
+  text-align: center;
+  letter-spacing: 0.6px;
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 #reels {
   display: flex;
   justify-content: space-between;
