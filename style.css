@@ -64,10 +64,11 @@ main {
   margin-right: auto;
 }
 
-/* Reel container - horizontally spaced reels */
+/* Reel container - 4 reels horizontally spaced */
 #reels {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* center reels horizontally */
+  gap: 15px; /* space between reels */
   margin: 20px 0;
 }
 
@@ -83,7 +84,7 @@ main {
   position: relative;
 }
 
-/* The container that holds stacked symbols vertically */
+/* The container that holds stacked symbols vertically inside each reel */
 .symbols {
   position: absolute;
   top: 0;
