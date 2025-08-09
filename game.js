@@ -1,7 +1,7 @@
 // === Slot Machine Game.js ===
 
 // Slot symbols you want to use
-const symbols = ["🍒", "🍋", "🍊", "⭐", "💎"];
+const symbols = ["🍒", "🍋", "🍊", "💎"];
 
 // Game state variables
 let credits = 1000;
