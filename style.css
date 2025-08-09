@@ -2,6 +2,7 @@
 * {
   box-sizing: border-box;
 }
+
 body {
   margin: 0;
   background: #0a0a0a;
@@ -12,6 +13,8 @@ body {
   min-height: 100vh;
   user-select: none;
 }
+
+/* Header styling */
 header {
   background: #062206;
   padding: 15px 20px;
@@ -22,6 +25,24 @@ header {
   color: #9ef69e;
   text-shadow: 0 0 10px #3e8e3e;
 }
+
+/* Centered logo container (if you add a logo image inside your header/main) */
+#slot-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Logo image styling */
+#fruitLogo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 10px;
+  user-select: none;
+}
+
+/* Main content area */
 main {
   flex: 1;
   max-width: 760px;
@@ -32,21 +53,7 @@ main {
   box-shadow: 0 0 40px #3ea53e;
 }
 
-/* Added for logo container and image */
-#slot-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-#fruitLogo {
-  width: 120px;
-  height: auto;
-  margin-bottom: 10px;
-  user-select: none;
-}
-
+/* Info text above reels */
 #info {
   font-size: 18px;
   margin-bottom: 15px;
@@ -57,35 +64,44 @@ main {
   margin-right: auto;
 }
 
+/* Reel container - horizontally spaced reels */
 #reels {
   display: flex;
   justify-content: space-between;
   margin: 20px 0;
 }
+
+/* Each reel box */
 .reel {
   width: 80px;
-  height: 240px;
+  height: 240px; /* 3 symbols * 80px each */
   background: #030;
   border: 3px solid #080;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: hidden; /* hide overflowing stacked symbols */
   box-shadow: inset 0 0 15px #050;
   position: relative;
 }
+
+/* The container that holds stacked symbols vertically */
 .symbols {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  transition: top 1.2s cubic-bezier(0.33, 1, 0.68, 1);
+  transition: transform 1.2s cubic-bezier(0.33, 1, 0.68, 1);
 }
+
+/* Each symbol inside reel */
 .symbol {
-  height: 80px;
+  height: 80px;       /* fixed height */
   font-size: 70px;
   line-height: 80px;
   text-align: center;
   user-select: none;
 }
+
+/* Highlight effect for winning symbols */
 .symbol.highlight {
   text-shadow:
     0 0 8px #bfff00,
@@ -93,6 +109,8 @@ main {
     0 0 25px #bfff00,
     0 0 40px #bfff00;
 }
+
+/* Controls area (buttons, selects) */
 #controls {
   display: flex;
   flex-wrap: wrap;
@@ -100,6 +118,8 @@ main {
   gap: 10px;
   margin-bottom: 15px;
 }
+
+/* Buttons and selects styling */
 button, select {
   background: #073007;
   border: 2px solid #0b520b;
@@ -112,22 +132,22 @@ button, select {
   user-select: none;
   transition: background 0.3s ease;
 }
+
+/* Hover effect */
 button:hover, select:hover {
   background: #0a860a;
   box-shadow: 0 0 10px #0fdb0f;
 }
+
+/* Disabled button style */
 button:disabled {
   background: #033003;
   box-shadow: none;
   cursor: not-allowed;
   color: #555;
 }
-#info {
-  font-size: 18px;
-  margin-bottom: 15px;
-  text-align: center;
-  letter-spacing: 0.6px;
-}
+
+/* Message text shown below reels */
 #message {
   font-size: 22px;
   text-align: center;
@@ -137,6 +157,8 @@ button:disabled {
   font-weight: 700;
   text-shadow: 0 0 4px #0b540b;
 }
+
+/* Payout modal backdrop */
 #payoutModal {
   position: fixed;
   top: 0;
@@ -149,6 +171,8 @@ button:disabled {
   justify-content: center;
   z-index: 999;
 }
+
+/* Payout modal content box */
 #payoutContent {
   background: #0b350b;
   border-radius: 12px;
@@ -157,21 +181,29 @@ button:disabled {
   box-shadow: 0 0 30px #12a512;
   color: #d2f7d2;
 }
+
+/* Payout modal heading */
 #payoutContent h2 {
   margin-top: 0;
   text-align: center;
   font-size: 24px;
   text-shadow: 0 0 5px #43c843;
 }
+
+/* Payout list */
 #payoutContent ul {
   list-style: none;
   padding-left: 0;
 }
+
+/* Each payout item */
 #payoutContent li {
   padding: 6px 0;
   font-size: 18px;
   border-bottom: 1px solid #27a12744;
 }
+
+/* Payout modal close button */
 #payoutCloseBtn {
   margin-top: 15px;
   display: block;
@@ -186,9 +218,13 @@ button:disabled {
   cursor: pointer;
   box-shadow: 0 0 8px #40db40;
 }
+
+/* Close button hover */
 #payoutCloseBtn:hover {
   background: #17bb17;
 }
+
+/* Footer style */
 footer {
   text-align: center;
   font-size: 14px;
@@ -196,6 +232,8 @@ footer {
   color: #555;
   user-select: none;
 }
+
+/* Responsive adjustments for smaller screens */
 @media (max-width: 600px) {
   #reels {
     justify-content: center;
