@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Advanced Buffalo-Style Slot Game</title>
+<title>Advanced Buffalo-Style Slot Game with Sound</title>
 <style>
   body {
     background: #111;
@@ -75,11 +75,9 @@
 </head>
 <body>
 
-<h1>Advanced Buffalo-Style Slot Game</h1>
+<h1>Advanced Buffalo-Style Slot Game with Sound</h1>
 <div id="slot-container">
-  <div id="reels">
-    <!-- 5 reels × 3 rows = 15 cells -->
-  </div>
+  <div id="reels"></div>
   <div id="controls">
     <button id="spinBtn">Spin</button>
     <button id="betDownBtn">- Bet</button>
@@ -91,46 +89,45 @@
   <div id="message"></div>
 </div>
 
+<!-- SOUND FILES -->
+<audio id="sound-spin" src="https://freesound.org/data/previews/341/341695_6245708-lq.mp3" preload="auto"></audio>
+<audio id="sound-reel-stop" src="https://freesound.org/data/previews/41/41544_512123-lq.mp3" preload="auto"></audio>
+<audio id="sound-win" src="https://freesound.org/data/previews/320/320655_5260875-lq.mp3" preload="auto"></audio>
+
 <script>
-// === SYMBOLS WITH WEIGHTS ===
-// Symbols and their display characters
 const SYMBOLS = [
-  { symbol: '🦬', weight: 20 }, // Buffalo - rare
-  { symbol: '🐅', weight: 25 }, // Tiger
-  { symbol: '🦅', weight: 30 }, // Eagle
-  { symbol: '🦌', weight: 50 }, // Deer
-  { symbol: '🍀', weight: 70 }, // Clover (wild)
-  { symbol: '🍎', weight: 80 }, // Apple
-  { symbol: '🔔', weight: 90 }, // Bell
-  { symbol: '⭐', weight: 100 } // Star (common)
+  { symbol: '🦬', weight: 20 },
+  { symbol: '🐅', weight: 25 },
+  { symbol: '🦅', weight: 30 },
+  { symbol: '🦌', weight: 50 },
+  { symbol: '🍀', weight: 70 },
+  { symbol: '🍎', weight: 80 },
+  { symbol: '🔔', weight: 90 },
+  { symbol: '⭐', weight: 100 }
 ];
 
-// Number of reels and rows
 const REELS_COUNT = 5;
 const ROWS_COUNT = 3;
 
-// Paylines (indexes of cells in reels) - total 10 paylines
-// Each sub-array length = number of reels (5), with row index (0-2) per reel
 const PAYLINES = [
-  [1,1,1,1,1], // middle row straight
-  [0,0,0,0,0], // top row straight
-  [2,2,2,2,2], // bottom row straight
-  [0,1,2,1,0], // V shape
-  [2,1,0,1,2], // inverted V
-  [0,0,1,0,0], // small dip
-  [2,2,1,2,2], // small rise
-  [1,0,0,0,1], // U shape left
-  [1,2,2,2,1], // U shape right
-  [0,1,1,1,2]  // diagonal line
+  [1,1,1,1,1],
+  [0,0,0,0,0],
+  [2,2,2,2,2],
+  [0,1,2,1,0],
+  [2,1,0,1,2],
+  [0,0,1,0,0],
+  [2,2,1,2,2],
+  [1,0,0,0,1],
+  [1,2,2,2,1],
+  [0,1,1,1,2]
 ];
 
-// Payouts (multipliers of bet) for 3,4,5 matches per symbol (only full match across payline)
 const PAYOUTS = {
-  '🦬': [50, 200, 1000], // Buffalo highest payout
+  '🦬': [50, 200, 1000],
   '🐅': [30, 150, 750],
   '🦅': [20, 100, 500],
   '🦌': [15, 75, 250],
-  '🍀': [10, 50, 200],  // Wild acts as any symbol
+  '🍀': [10, 50, 200],
   '🍎': [8, 40, 150],
   '🔔': [5, 25, 100],
   '⭐': [2, 10, 50]
@@ -149,7 +146,10 @@ const betUpBtn = document.getElementById('betUpBtn');
 const betDownBtn = document.getElementById('betDownBtn');
 const messageEl = document.getElementById('message');
 
-// Build initial empty grid cells for reels display
+const soundSpin = document.getElementById('sound-spin');
+const soundReelStop = document.getElementById('sound-reel-stop');
+const soundWin = document.getElementById('sound-win');
+
 function createGrid() {
   reelsEl.innerHTML = '';
   for(let i=0; i < REELS_COUNT * ROWS_COUNT; i++) {
@@ -160,7 +160,6 @@ function createGrid() {
   }
 }
 
-// Weighted random symbol picker
 function weightedRandomSymbol() {
   let totalWeight = SYMBOLS.reduce((sum, s) => sum + s.weight, 0);
   let rand = Math.random() * totalWeight;
@@ -168,10 +167,9 @@ function weightedRandomSymbol() {
     if(rand < SYMBOLS[i].weight) return SYMBOLS[i].symbol;
     rand -= SYMBOLS[i].weight;
   }
-  return SYMBOLS[SYMBOLS.length-1].symbol; // fallback
+  return SYMBOLS[SYMBOLS.length-1].symbol;
 }
 
-// Generate a spin result: array of arrays [reel][row] with symbols
 function generateSpinResult() {
   const result = [];
   for(let r=0; r < REELS_COUNT; r++) {
@@ -184,7 +182,6 @@ function generateSpinResult() {
   return result;
 }
 
-// Update reel cells display
 function displayReels(result) {
   for(let r=0; r < REELS_COUNT; r++) {
     for(let row=0; row < ROWS_COUNT; row++) {
@@ -196,10 +193,9 @@ function displayReels(result) {
   }
 }
 
-// Check if symbol matches on payline with wilds (🍀)
 function matchSymbolsOnPayline(result, payline) {
   let firstSymbol = result[0][payline[0]];
-  if(firstSymbol === '🍀') { // If first is wild, find next non-wild
+  if(firstSymbol === '🍀') {
     for(let r=1; r<REELS_COUNT; r++) {
       if(result[r][payline[r]] !== '🍀') {
         firstSymbol = result[r][payline[r]];
@@ -207,7 +203,7 @@ function matchSymbolsOnPayline(result, payline) {
       }
     }
   }
-  if(!firstSymbol) return 0; // no match
+  if(!firstSymbol) return 0;
 
   let matchCount = 0;
   for(let r=0; r<REELS_COUNT; r++) {
@@ -221,7 +217,6 @@ function matchSymbolsOnPayline(result, payline) {
   return matchCount;
 }
 
-// Calculate total win for spin result
 function calculateWin(result) {
   let totalWin = 0;
   let winningLines = [];
@@ -230,7 +225,6 @@ function calculateWin(result) {
     const payline = PAYLINES[i];
     const matches = matchSymbolsOnPayline(result, payline);
     if(matches >= 3) {
-      // Determine base symbol (non-wild)
       let baseSymbol = result[0][payline[0]];
       if(baseSymbol === '🍀') {
         for(let r=1; r<REELS_COUNT; r++) {
@@ -250,13 +244,10 @@ function calculateWin(result) {
   return {totalWin, winningLines};
 }
 
-// Highlight winning paylines on reels
 function highlightWinningLines(result, winningLines) {
-  // Clear previous highlights
   for(let cell of reelsEl.children) {
     cell.classList.remove('highlight');
   }
-  // Highlight cells in winning paylines
   for(let winLine of winningLines) {
     const payline = PAYLINES[winLine.lineIndex];
     for(let r=0; r<winLine.count; r++) {
@@ -267,35 +258,34 @@ function highlightWinningLines(result, winningLines) {
   }
 }
 
-// Animate reel spin with easing
-function animateSpin(finalResult) {
-  return new Promise((resolve) => {
-    let spins = 30; // total animation steps
-    let currentSpin = 0;
-    const intervalTime = 50;
-    const interval = setInterval(() => {
-      currentSpin++;
-      // During spin show random symbols
+async function animateSpin(finalResult) {
+  const intervalTime = 50;
+  const spinsPerReel = 20;
+
+  for(let reelIndex = 0; reelIndex < REELS_COUNT; reelIndex++) {
+    for(let spinCount = 0; spinCount < spinsPerReel; spinCount++) {
       const spinningResult = [];
-      for(let r=0; r < REELS_COUNT; r++) {
+
+      for(let r = 0; r < REELS_COUNT; r++) {
         const col = [];
-        for(let row=0; row < ROWS_COUNT; row++) {
-          col.push(weightedRandomSymbol());
+        if(r <= reelIndex) {
+          col.push(...finalResult[r]);
+        } else {
+          for(let row=0; row < ROWS_COUNT; row++) {
+            col.push(weightedRandomSymbol());
+          }
         }
         spinningResult.push(col);
       }
-      displayReels(spinningResult);
 
-      if(currentSpin >= spins) {
-        clearInterval(interval);
-        displayReels(finalResult);
-        resolve();
-      }
-    }, intervalTime);
-  });
+      displayReels(spinningResult);
+      await new Promise(r => setTimeout(r, intervalTime));
+    }
+    soundReelStop.currentTime = 0;
+    soundReelStop.play();
+  }
 }
 
-// Update UI info text
 function updateUI() {
   creditsEl.textContent = credits;
   betEl.textContent = bet;
@@ -317,6 +307,9 @@ async function spin() {
   credits -= bet;
   updateUI();
 
+  soundSpin.currentTime = 0;
+  soundSpin.play();
+
   const finalResult = generateSpinResult();
 
   await animateSpin(finalResult);
@@ -327,6 +320,8 @@ async function spin() {
   updateUI();
 
   if(win > 0) {
+    soundWin.currentTime = 0;
+    soundWin.play();
     messageEl.textContent = `🎉 You won ${win} credits!`;
     highlightWinningLines(finalResult, winningLines);
   } else {
@@ -353,7 +348,6 @@ betDownBtn.addEventListener('click', () => {
   }
 });
 
-// Init
 createGrid();
 updateUI();
 </script>
