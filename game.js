@@ -1,122 +1,109 @@
-// === Slot Machine Game.js ===
-
-// Slot symbols you want to use
-const symbols = ["🍒", "🍋", "🍊", "💎"];
-
-// Game state variables
-let credits = 1000;
-let bet = 10;
-let autoSpinActive = false;
-
-// DOM elements
+const symbols = ["🍒", "🍋", "🍊", "⭐", "💎"];
+const reels = document.querySelectorAll(".reel .symbols");
 const creditsEl = document.getElementById("credits");
 const betEl = document.getElementById("bet");
-const reelsEls = document.querySelectorAll(".reel .symbols"); // 4 reels
+const messageEl = document.getElementById("message");
 const spinBtn = document.getElementById("spinBtn");
 const autoSpinBtn = document.getElementById("autoSpinBtn");
-const messageEl = document.getElementById("message");
 
-// Update UI with current credits and bet
+let credits = 1000;
+let bet = 10;
+let autoSpin = false;
+
 function updateUI() {
   creditsEl.textContent = credits;
   betEl.textContent = bet;
 }
 
-// Show a temporary message below reels
-function showMessage(text) {
-  messageEl.textContent = text;
-  setTimeout(() => {
-    messageEl.textContent = "";
-  }, 3000);
-}
-
-// Helper: generate random symbols array of length 3 for vertical reel
-function getRandomSymbols() {
-  const arr = [];
-  for (let i = 0; i < 3; i++) {
-    const randSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-    arr.push(randSymbol);
+// Generate random symbols for each reel: 3 symbols vertically stacked
+function generateReelSymbols() {
+  const reelSymbolsArr = [];
+  for (let i = 0; i < reels.length; i++) {
+    let symbolsForReel = [];
+    for (let j = 0; j < 3; j++) {
+      symbolsForReel.push(symbols[Math.floor(Math.random() * symbols.length)]);
+    }
+    reelSymbolsArr.push(symbolsForReel);
   }
-  return arr;
+  return reelSymbolsArr;
 }
 
-// Spin the slot reels with animation
-function spin() {
+// Animate reels by changing transform: translateY
+async function spin() {
   if (credits < bet) {
     showMessage("❌ Not enough credits!");
-    autoSpinActive = false;
-    autoSpinBtn.textContent = "Auto Spin: OFF";
+    stopAutoSpin();
     return;
   }
 
   credits -= bet;
   updateUI();
+  showMessage("");
 
-  // For each reel
-  reelsEls.forEach((symbolsContainer, reelIndex) => {
-    // Clear previous symbols
-    symbolsContainer.innerHTML = "";
+  const reelSymbolsArr = generateReelSymbols();
 
-    // Generate 3 new symbols for vertical display
-    const newSymbols = getRandomSymbols();
+  // For each reel, build the symbols inside and animate spinning
+  for (let i = 0; i < reels.length; i++) {
+    const reelDiv = reels[i];
+    reelDiv.style.transition = "none";
+    // Build stacked symbols string (we add 3 extra symbols for smooth spin effect)
+    // The order is: last 3 symbols + new 3 symbols
+    const extendedSymbols = reelSymbolsArr[i].slice(-3).concat(reelSymbolsArr[i]);
+    reelDiv.innerHTML = extendedSymbols.map(sym => `<div class="symbol">${sym}</div>`).join("");
+    // Reset position to top (showing last 3 symbols)
+    reelDiv.style.transform = `translateY(-240px)`;
 
-    // Create and append symbol elements stacked vertically
-    newSymbols.forEach(sym => {
-      const symEl = document.createElement("div");
-      symEl.classList.add("symbol");
-      symEl.textContent = sym;
-      symbolsContainer.appendChild(symEl);
-    });
+    // Allow DOM update
+    await new Promise(r => setTimeout(r, 50));
 
-    // Reset position to top (no transform)
-    symbolsContainer.style.transform = "translateY(0)";
-
-    // Animate spin: slide symbols up 1 full reel height (3 symbols × 80px)
-    // You can tweak duration and easing in CSS transition
-    setTimeout(() => {
-      symbolsContainer.style.transition = "transform 1.2s cubic-bezier(0.33, 1, 0.68, 1)";
-      symbolsContainer.style.transform = `translateY(-240px)`; // 3 symbols × 80px height each
-    }, 50);
-
-    // After animation, reset transition and position to show new symbols in place
-    setTimeout(() => {
-      symbolsContainer.style.transition = "none";
-      symbolsContainer.style.transform = "translateY(0)";
-    }, 1300);
-  });
-
-  // Simple win check: do all reels have same symbol in the middle row (index 1)?
-  const middleSymbols = Array.from(reelsEls).map(reel => reel.children[1].textContent);
-  if (middleSymbols.every(sym => sym === middleSymbols[0])) {
-    const payout = bet * 10;
-    credits += payout;
-    showMessage(`🎉 Jackpot! You win ${payout} credits! 🎉`);
-  } else {
-    showMessage("❌ Try Again!");
+    // Animate down to show new symbols
+    reelDiv.style.transition = "transform 1s cubic-bezier(0.33,1,0.68,1)";
+    reelDiv.style.transform = "translateY(0)";
   }
 
-  updateUI();
+  // Wait for animation to finish (approx 1s)
+  await new Promise(r => setTimeout(r, 1200));
+
+  // Check win condition (for simplicity, check middle row symbols match across reels)
+  const middleSymbols = reelSymbolsArr.map(reel => reel[1]);
+  const allSame = middleSymbols.every(sym => sym === middleSymbols[0]);
+
+  if (allSame) {
+    const payout = bet * 10;
+    credits += payout;
+    updateUI();
+    showMessage(`🎉 JACKPOT! You won ${payout} credits! 🎉`);
+  } else {
+    showMessage("Try Again!");
+  }
 }
 
-// Auto Spin toggle
-function toggleAutoSpin() {
-  autoSpinActive = !autoSpinActive;
-  autoSpinBtn.textContent = autoSpinActive ? "Stop Auto Spin" : "Auto Spin: OFF";
+function showMessage(text) {
+  messageEl.textContent = text;
+}
 
-  if (autoSpinActive) {
+function toggleAutoSpin() {
+  autoSpin = !autoSpin;
+  autoSpinBtn.textContent = autoSpin ? "Stop Auto Spin" : "Auto Spin: OFF";
+
+  if (autoSpin) {
     autoSpinLoop();
   }
 }
 
-function autoSpinLoop() {
-  if (!autoSpinActive) return;
-  spin();
-  setTimeout(autoSpinLoop, 1500); // wait for spin animation + extra time
+async function autoSpinLoop() {
+  while (autoSpin) {
+    await spin();
+    await new Promise(r => setTimeout(r, 1500));
+  }
 }
 
-// Event Listeners
+function stopAutoSpin() {
+  autoSpin = false;
+  autoSpinBtn.textContent = "Auto Spin: OFF";
+}
+
 spinBtn.addEventListener("click", spin);
 autoSpinBtn.addEventListener("click", toggleAutoSpin);
 
-// Initialize UI on page load
 updateUI();
