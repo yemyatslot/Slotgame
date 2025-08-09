@@ -3,32 +3,23 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Scatter Style Slot Game</title>
+<title>Advanced Buffalo Slot Game</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<header>🧩 Scatter Slot Game 🧩</header>
+<header>🦬 Advanced Buffalo Slot 🦬</header>
 
 <main>
   <div id="info">
-    Credits: <span id="credits">1000</span> | Bet: <span id="bet">10</span>
+    Credits: <span id="credits">1000</span> | Bet: <span id="bet">10</span> | Wins: <span id="totalWins">0</span> | Spins: <span id="totalSpins">0</span> | RTP: <span id="rtp">0.00%</span>
   </div>
 
   <div id="reels">
-    <!-- 4 reels, each with 3 symbols stacked vertically -->
-    <div class="reel">
-      <div class="symbols"></div>
-    </div>
-    <div class="reel">
-      <div class="symbols"></div>
-    </div>
-    <div class="reel">
-      <div class="symbols"></div>
-    </div>
-    <div class="reel">
-      <div class="symbols"></div>
-    </div>
+    <div class="reel"><div class="symbols"></div></div>
+    <div class="reel"><div class="symbols"></div></div>
+    <div class="reel"><div class="symbols"></div></div>
+    <div class="reel"><div class="symbols"></div></div>
   </div>
 
   <div id="message"></div>
@@ -36,8 +27,43 @@
   <div id="controls">
     <button id="spinBtn">Spin</button>
     <button id="autoSpinBtn">Auto Spin: OFF</button>
+
+    <select id="betSelect" aria-label="Select Bet">
+      <option value="10">Bet: 10</option>
+      <option value="20">Bet: 20</option>
+      <option value="50">Bet: 50</option>
+      <option value="100">Bet: 100</option>
+      <option value="200">Bet: 200</option>
+      <option value="max">Max Bet</option>
+    </select>
+
+    <button id="soundToggleBtn">Sound: ON</button>
+    <button id="payoutBtn">Show Payouts</button>
   </div>
 </main>
+
+<!-- Payout Modal -->
+<div id="payoutModal" role="dialog" aria-modal="true" aria-labelledby="payoutTitle">
+  <div id="payoutContent">
+    <h2 id="payoutTitle">Payout Table</h2>
+    <ul>
+      <li>🦬 Buffalo: 3x = 50, 4x = 200, 5x = 1000</li>
+      <li>🐅 Tiger: 3x = 30, 4x = 150, 5x = 750</li>
+      <li>🦅 Eagle: 3x = 20, 4x = 100, 5x = 500</li>
+      <li>🦌 Deer: 3x = 15, 4x = 75, 5x = 250</li>
+      <li>🍀 Clover (Wild): substitutes all</li>
+      <li>🍎 Apple: 3x = 8, 4x = 40, 5x = 150</li>
+      <li>🔔 Bell: 3x = 5, 4x = 25, 5x = 100</li>
+      <li>⭐ Star: 3x = 2, 4x = 10, 5x = 50</li>
+    </ul>
+    <button id="payoutCloseBtn">Close</button>
+  </div>
+</div>
+
+<!-- Sounds -->
+<audio id="soundSpin" src="https://freesound.org/data/previews/341/341695_6245708-lq.mp3" preload="auto"></audio>
+<audio id="soundReelStop" src="https://freesound.org/data/previews/41/41544_512123-lq.mp3" preload="auto"></audio>
+<audio id="soundWin" src="https://freesound.org/data/previews/320/320655_5260875-lq.mp3" preload="auto"></audio>
 
 <script src="game.js"></script>
 </body>
