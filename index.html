@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Advanced Buffalo-Style Slot Game with Sound</title>
+<title>Buffalo-Style Slot Game with Sound Toggle</title>
 <style>
   body {
     background: #111;
@@ -46,8 +46,8 @@
   }
   button {
     font-size: 20px;
-    padding: 12px 30px;
-    margin: 0 10px;
+    padding: 12px 20px;
+    margin: 0 10px 10px 10px;
     border-radius: 10px;
     border: none;
     background: #0a0;
@@ -75,13 +75,14 @@
 </head>
 <body>
 
-<h1>Advanced Buffalo-Style Slot Game with Sound</h1>
+<h1>Buffalo-Style Slot Game with Sound Toggle</h1>
 <div id="slot-container">
   <div id="reels"></div>
   <div id="controls">
     <button id="spinBtn">Spin</button>
     <button id="betDownBtn">- Bet</button>
     <button id="betUpBtn">+ Bet</button>
+    <button id="soundToggleBtn">Sound: ON</button>
   </div>
   <div id="info">
     Credits: <span id="credits">1000</span> | Bet: <span id="bet">10</span> | Win: <span id="win">0</span>
@@ -137,6 +138,8 @@ let credits = 1000;
 let bet = 10;
 let win = 0;
 
+let soundEnabled = true;
+
 const reelsEl = document.getElementById('reels');
 const creditsEl = document.getElementById('credits');
 const betEl = document.getElementById('bet');
@@ -145,6 +148,7 @@ const spinBtn = document.getElementById('spinBtn');
 const betUpBtn = document.getElementById('betUpBtn');
 const betDownBtn = document.getElementById('betDownBtn');
 const messageEl = document.getElementById('message');
+const soundToggleBtn = document.getElementById('soundToggleBtn');
 
 const soundSpin = document.getElementById('sound-spin');
 const soundReelStop = document.getElementById('sound-reel-stop');
@@ -281,8 +285,14 @@ async function animateSpin(finalResult) {
       displayReels(spinningResult);
       await new Promise(r => setTimeout(r, intervalTime));
     }
-    soundReelStop.currentTime = 0;
-    soundReelStop.play();
+    playSound(soundReelStop);
+  }
+}
+
+function playSound(soundElement) {
+  if(soundEnabled) {
+    soundElement.currentTime = 0;
+    soundElement.play();
   }
 }
 
@@ -307,8 +317,7 @@ async function spin() {
   credits -= bet;
   updateUI();
 
-  soundSpin.currentTime = 0;
-  soundSpin.play();
+  playSound(soundSpin);
 
   const finalResult = generateSpinResult();
 
@@ -320,8 +329,7 @@ async function spin() {
   updateUI();
 
   if(win > 0) {
-    soundWin.currentTime = 0;
-    soundWin.play();
+    playSound(soundWin);
     messageEl.textContent = `🎉 You won ${win} credits!`;
     highlightWinningLines(finalResult, winningLines);
   } else {
@@ -346,6 +354,11 @@ betDownBtn.addEventListener('click', () => {
     bet -= 10;
     updateUI();
   }
+});
+
+soundToggleBtn.addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+  soundToggleBtn.textContent = soundEnabled ? 'Sound: ON' : 'Sound: OFF';
 });
 
 createGrid();
