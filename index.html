@@ -5,14 +5,157 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Advanced Buffalo Slot Game</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  body {
+    background: #0a0a0a;
+    color: #d0f0c0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  header {
+    font-size: 2rem;
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  #slot-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  #fruitLogo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 10px;
+  }
+
+  #info {
+    font-size: 1.25rem;
+    background-color: #063006;
+    padding: 8px 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px #0c0;
+    user-select: none;
+    text-align: center;
+    min-width: 320px;
+  }
+
+  #reels {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+
+  .reel {
+    background: #103010;
+    border: 2px solid #0c0;
+    border-radius: 10px;
+    width: 60px;
+    height: 60px;
+    margin: 0 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    user-select: none;
+  }
+
+  #message {
+    height: 30px;
+    font-size: 1.1rem;
+    color: #ff6666;
+    margin-bottom: 10px;
+    text-align: center;
+    min-height: 30px;
+  }
+
+  #controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  #controls > * {
+    font-size: 1rem;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background-color: #0a550a;
+    color: #d0f0c0;
+    user-select: none;
+    min-width: 100px;
+  }
+
+  #controls select {
+    background-color: #063006;
+    color: #d0f0c0;
+    cursor: pointer;
+  }
+
+  /* Payout Modal styles */
+  #payoutModal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+  }
+
+  #payoutContent {
+    background: #0a0a0a;
+    border: 2px solid #0c0;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 320px;
+    color: #d0f0c0;
+  }
+
+  #payoutContent h2 {
+    margin-top: 0;
+    text-align: center;
+  }
+
+  #payoutContent ul {
+    padding-left: 1.2em;
+    margin-bottom: 20px;
+  }
+
+  #payoutContent button {
+    display: block;
+    margin: 0 auto;
+    background-color: #0a550a;
+    border: none;
+    color: #d0f0c0;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
 
 <header>🦬 Advanced Buffalo Slot 🦬</header>
 
 <main>
-  <div id="info">
-    Credits: <span id="credits">1000</span> | Bet: <span id="bet">10</span> | Wins: <span id="totalWins">0</span> | Spins: <span id="totalSpins">0</span> | RTP: <span id="rtp">0.00%</span>
+  <div id="slot-header">
+    <img src="fruit-logo.png" alt="Fruit Logo" id="fruitLogo" />
+    <div id="info">
+      Credits: <span id="credits">1000</span> | Bet: <span id="bet">10</span> | Wins: <span id="totalWins">0</span> | Spins: <span id="totalSpins">0</span> | RTP: <span id="rtp">0.00%</span>
+    </div>
   </div>
 
   <div id="reels">
@@ -68,5 +211,45 @@
 <audio id="bgMusic" src="https://cdn.pixabay.com/download/audio/2022/03/26/audio_f2b8e92d13.mp3?filename=retro-game-loop-11036.mp3" preload="auto" loop></audio>
 
 <script src="game.js"></script>
+
+<script>
+  // Payout modal open/close handlers
+  const payoutModal = document.getElementById('payoutModal');
+  const payoutBtn = document.getElementById('payoutBtn');
+  const payoutCloseBtn = document.getElementById('payoutCloseBtn');
+
+  payoutBtn.addEventListener('click', () => {
+    payoutModal.style.display = 'flex';
+  });
+
+  payoutCloseBtn.addEventListener('click', () => {
+    payoutModal.style.display = 'none';
+  });
+
+  window.addEventListener('click', (e) => {
+    if (e.target === payoutModal) {
+      payoutModal.style.display = 'none';
+    }
+  });
+
+  // Bet select change handler (update bet displayed and current bet)
+  const betSelect = document.getElementById('betSelect');
+  const betDisplay = document.getElementById('bet');
+  let currentBet = 10;
+
+  betSelect.addEventListener('change', () => {
+    const val = betSelect.value;
+    if (val === 'max') {
+      currentBet = 200; // max bet fixed for example
+    } else {
+      currentBet = Number(val);
+    }
+    betDisplay.textContent = currentBet;
+
+    // You should also update your game.js bet variable accordingly
+    if (typeof updateBet === 'function') updateBet(currentBet);
+  });
+</script>
+
 </body>
 </html>
