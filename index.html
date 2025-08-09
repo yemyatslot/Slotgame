@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simple Slot Game</title>
+<style>
+  body {
+    background: #222;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 50px;
+  }
+  .reels {
+    font-size: 80px;
+    margin: 30px 0;
+    letter-spacing: 30px;
+  }
+  button {
+    font-size: 24px;
+    padding: 10px 40px;
+    cursor: pointer;
+    background: #28a745;
+    border: none;
+    color: white;
+    border-radius: 8px;
+  }
+  button:active {
+    background: #1e7e34;
+  }
+</style>
+</head>
+<body>
+
+<h1>Simple Slot Machine</h1>
+<div class="reels" id="reels">🍒 🍒 🍒</div>
+<button id="spinBtn">Spin</button>
+<p id="result"></p>
+
+<script>
+  const symbols = ['🍒', '🍋', '🔔', '⭐', '7️⃣'];
+
+  function spinReels() {
+    return [
+      symbols[Math.floor(Math.random() * symbols.length)],
+      symbols[Math.floor(Math.random() * symbols.length)],
+      symbols[Math.floor(Math.random() * symbols.length)]
+    ];
+  }
+
+  function checkWin(reels) {
+    return reels[0] === reels[1] && reels[1] === reels[2];
+  }
+
+  const reelsEl = document.getElementById('reels');
+  const resultEl = document.getElementById('result');
+  const spinBtn = document.getElementById('spinBtn');
+
+  spinBtn.addEventListener('click', () => {
+    const reels = spinReels();
+    reelsEl.textContent = reels.join(' ');
+    if (checkWin(reels)) {
+      resultEl.textContent = '🎉 You win! 🎉';
+      resultEl.style.color = '#28a745';
+    } else {
+      resultEl.textContent = 'Try again!';
+      resultEl.style.color = '#f44336';
+    }
+  });
+</script>
+
+</body>
+</html>
