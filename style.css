@@ -1,8 +1,7 @@
-/* Reset and base */
+/* Basic reset */
 * {
   box-sizing: border-box;
 }
-
 body {
   margin: 0;
   background: #0a0a0a;
@@ -14,37 +13,17 @@ body {
   user-select: none;
 }
 
-/* Header styling */
 header {
   background: #062206;
   padding: 15px 20px;
   text-align: center;
   font-weight: 700;
   font-size: 28px;
-  letter-spacing: 2px;
   color: #9ef69e;
   text-shadow: 0 0 10px #3e8e3e;
 }
 
-/* Centered logo container (if you add a logo image inside your header/main) */
-#slot-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-/* Logo image styling */
-#fruitLogo {
-  width: 120px;
-  height: auto;
-  margin-bottom: 10px;
-  user-select: none;
-}
-
-/* Main content area */
 main {
-  flex: 1;
   max-width: 760px;
   margin: 20px auto;
   background: #122612;
@@ -53,204 +32,79 @@ main {
   box-shadow: 0 0 40px #3ea53e;
 }
 
-/* Info text above reels */
 #info {
   font-size: 18px;
   margin-bottom: 15px;
   text-align: center;
-  letter-spacing: 0.6px;
-  max-width: 760px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
-/* Reel container - 4 reels horizontally spaced */
 #reels {
   display: flex;
-  justify-content: center; /* center reels horizontally */
-  gap: 15px; /* space between reels */
+  justify-content: space-between;
   margin: 20px 0;
 }
 
-/* Each reel box */
 .reel {
   width: 80px;
-  height: 240px; /* 3 symbols * 80px each */
+  height: 240px; /* 3 symbols * 80px */
   background: #030;
   border: 3px solid #080;
   border-radius: 12px;
-  overflow: hidden; /* hide overflowing stacked symbols */
-  box-shadow: inset 0 0 15px #050;
+  overflow: hidden;
   position: relative;
+  box-shadow: inset 0 0 15px #050;
 }
 
-/* The container that holds stacked symbols vertically inside each reel */
 .symbols {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  transition: transform 1.2s cubic-bezier(0.33, 1, 0.68, 1);
+  transition: transform 1s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
-/* Each symbol inside reel */
 .symbol {
-  height: 80px;       /* fixed height */
+  height: 80px;
   font-size: 70px;
   line-height: 80px;
   text-align: center;
   user-select: none;
 }
 
-/* Highlight effect for winning symbols */
-.symbol.highlight {
-  text-shadow:
-    0 0 8px #bfff00,
-    0 0 15px #bfff00,
-    0 0 25px #bfff00,
-    0 0 40px #bfff00;
+#message {
+  text-align: center;
+  color: #aaffaa;
+  font-weight: bold;
+  margin-bottom: 20px;
+  min-height: 30px;
 }
 
-/* Controls area (buttons, selects) */
 #controls {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
+  text-align: center;
 }
 
-/* Buttons and selects styling */
-button, select {
+button {
   background: #073007;
   border: 2px solid #0b520b;
   border-radius: 10px;
   color: #b9efb9;
   font-size: 18px;
-  padding: 10px 18px;
+  padding: 10px 20px;
   cursor: pointer;
+  margin: 0 10px;
   box-shadow: 0 0 6px #0b520b;
   user-select: none;
   transition: background 0.3s ease;
 }
 
-/* Hover effect */
-button:hover, select:hover {
+button:hover {
   background: #0a860a;
   box-shadow: 0 0 10px #0fdb0f;
 }
 
-/* Disabled button style */
 button:disabled {
   background: #033003;
-  box-shadow: none;
   cursor: not-allowed;
   color: #555;
-}
-
-/* Message text shown below reels */
-#message {
-  font-size: 22px;
-  text-align: center;
-  min-height: 30px;
-  margin-bottom: 20px;
-  color: #aaffaa;
-  font-weight: 700;
-  text-shadow: 0 0 4px #0b540b;
-}
-
-/* Payout modal backdrop */
-#payoutModal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.85);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-/* Payout modal content box */
-#payoutContent {
-  background: #0b350b;
-  border-radius: 12px;
-  padding: 25px 30px;
-  width: 320px;
-  box-shadow: 0 0 30px #12a512;
-  color: #d2f7d2;
-}
-
-/* Payout modal heading */
-#payoutContent h2 {
-  margin-top: 0;
-  text-align: center;
-  font-size: 24px;
-  text-shadow: 0 0 5px #43c843;
-}
-
-/* Payout list */
-#payoutContent ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-/* Each payout item */
-#payoutContent li {
-  padding: 6px 0;
-  font-size: 18px;
-  border-bottom: 1px solid #27a12744;
-}
-
-/* Payout modal close button */
-#payoutCloseBtn {
-  margin-top: 15px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 8px 22px;
-  background: #0f8f0f;
-  border-radius: 10px;
-  border: none;
-  font-weight: 600;
-  font-size: 18px;
-  cursor: pointer;
-  box-shadow: 0 0 8px #40db40;
-}
-
-/* Close button hover */
-#payoutCloseBtn:hover {
-  background: #17bb17;
-}
-
-/* Footer style */
-footer {
-  text-align: center;
-  font-size: 14px;
-  padding: 12px;
-  color: #555;
-  user-select: none;
-}
-
-/* Responsive adjustments for smaller screens */
-@media (max-width: 600px) {
-  #reels {
-    justify-content: center;
-    gap: 10px;
-  }
-  .reel {
-    width: 60px;
-    height: 180px;
-  }
-  .symbol {
-    font-size: 50px;
-    height: 60px;
-    line-height: 60px;
-  }
-  button, select {
-    font-size: 16px;
-    padding: 8px 14px;
-  }
+  box-shadow: none;
 }
