@@ -1,57 +1,55 @@
-// === Slot Machine Game.js ===
+// === Slot Machine Game ===
 
-// Slot symbols for reels
-const symbols = ["🍒", "🍋", "🍊", "⭐", "💎"];
+// Symbols for the reels
+const SYMBOLS = ["🍒", "🍋", "🍊", "⭐", "💎"];
 
 // Game state
 let credits = 1000;
 let bet = 10;
-let autoSpinActive = false;
+let autoSpin = false;
 let totalWins = 0;
 let totalSpins = 0;
 
-// DOM elements
+// DOM references
 const creditsEl = document.getElementById("credits");
 const betEl = document.getElementById("bet");
-const totalWinsEl = document.getElementById("totalWins");
-const totalSpinsEl = document.getElementById("totalSpins");
+const winsEl = document.getElementById("totalWins");
+const spinsEl = document.getElementById("totalSpins");
 const messageEl = document.getElementById("message");
 const reels = [...document.querySelectorAll("#reels .symbols")];
 const spinBtn = document.getElementById("spinBtn");
 const autoSpinBtn = document.getElementById("autoSpinBtn");
 const betSelect = document.getElementById("betSelect");
 
-const soundSpin = document.getElementById("soundSpin");
-const soundReelStop = document.getElementById("soundReelStop");
-const soundWin = document.getElementById("soundWin");
+// Sounds
+const sSpin = document.getElementById("soundSpin");
+const sStop = document.getElementById("soundReelStop");
+const sWin = document.getElementById("soundWin");
 
-// Update UI info
+// Update displayed values
 function updateUI() {
   creditsEl.textContent = credits;
   betEl.textContent = bet;
-  totalWinsEl.textContent = totalWins;
-  totalSpinsEl.textContent = totalSpins;
+  winsEl.textContent = totalWins;
+  spinsEl.textContent = totalSpins;
 }
 
-// Show temporary message
-function showMessage(text) {
-  messageEl.textContent = text;
+// Show a temporary message
+function showMessage(msg) {
+  messageEl.textContent = msg;
 }
 
-// Generate an array of 3 symbols for one reel
-function generateReelSymbols() {
-  let arr = [];
-  for (let i = 0; i < 3; i++) {
-    arr.push(symbols[Math.floor(Math.random() * symbols.length)]);
-  }
-  return arr;
+// Generate 3 random symbols for a reel
+function getReel() {
+  return Array.from({ length: 3 }, () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
 }
 
-// Spin function with animation and sounds
+// Main spin logic
 async function spin() {
   if (credits < bet) {
     showMessage("❌ Not enough credits!");
-    stopAutoSpin();
+    autoSpin = false;
+    autoSpinBtn.textContent = "Auto Spin: OFF";
     return;
   }
 
@@ -60,93 +58,69 @@ async function spin() {
   updateUI();
   showMessage("");
 
-  soundSpin.currentTime = 0;
-  soundSpin.play();
+  // Play spin sound
+  sSpin.currentTime = 0;
+  sSpin.play();
 
-  // Generate symbols for each reel (3 symbols each)
-  const reelsSymbolsArr = reels.map(() => generateReelSymbols());
+  const result = reels.map(() => getReel());
 
-  // Animate each reel sequentially
+  // Animate reels
   for (let i = 0; i < reels.length; i++) {
     const reelDiv = reels[i];
-
-    // Prepare symbols for animation (3 symbols + 3 extra to scroll)
-    const extendedSymbols = [...reelsSymbolsArr[i], ...generateReelSymbols()];
-
+    const extended = [...result[i], ...getReel()];
     reelDiv.style.transition = "none";
-    reelDiv.innerHTML = extendedSymbols.map(sym => `<div class="symbol">${sym}</div>`).join("");
-    reelDiv.style.transform = `translateY(-240px)`; // start position to show middle symbols
-
-    // Force reflow for transition to work
-    void reelDiv.offsetWidth;
-
-    // Animate to top (simulate spin)
-    reelDiv.style.transition = "transform 1s cubic-bezier(0.33,1,0.68,1)";
+    reelDiv.innerHTML = extended.map(s => `<div class="symbol">${s}</div>`).join("");
+    reelDiv.style.transform = "translateY(-240px)";
+    void reelDiv.offsetWidth; // trigger reflow
+    reelDiv.style.transition = "transform 1s ease-out";
     reelDiv.style.transform = "translateY(-480px)";
 
-    // Play reel stop sound staggered
     setTimeout(() => {
-      soundReelStop.currentTime = 0;
-      soundReelStop.play();
+      sStop.currentTime = 0;
+      sStop.play();
     }, i * 400);
 
-    // Wait for animation to finish before next reel
     await new Promise(r => setTimeout(r, 1200));
   }
 
-  // Check win on middle row (index 1 of each reel)
-  const middleSymbols = reelsSymbolsArr.map(arr => arr[1]);
-  const allSame = middleSymbols.every(sym => sym === middleSymbols[0]);
-
-  if (allSame) {
+  // Check win (middle row)
+  const middle = result.map(r => r[1]);
+  if (middle.every(s => s === middle[0])) {
     const payout = bet * 10;
     credits += payout;
     totalWins += payout;
     updateUI();
-    showMessage(`🎉 JACKPOT! You won ${payout} credits! 🎉`);
-
-    soundWin.currentTime = 0;
-    soundWin.play();
+    showMessage(`🎉 JACKPOT! Won ${payout} credits!`);
+    sWin.currentTime = 0;
+    sWin.play();
   } else {
-    showMessage("Try Again!");
+    showMessage("Try again!");
   }
 }
 
-// Auto spin control
-function toggleAutoSpin() {
-  autoSpinActive = !autoSpinActive;
-  autoSpinBtn.textContent = autoSpinActive ? "Stop Auto Spin" : "Auto Spin: OFF";
-
-  if (autoSpinActive) {
-    autoSpinLoop();
-  }
-}
-
+// Auto spin
 async function autoSpinLoop() {
-  while (autoSpinActive) {
+  while (autoSpin) {
     await spin();
-    await new Promise(r => setTimeout(r, 1500)); // delay between spins
+    await new Promise(r => setTimeout(r, 1500));
   }
 }
 
-function stopAutoSpin() {
-  autoSpinActive = false;
-  autoSpinBtn.textContent = "Auto Spin: OFF";
+function toggleAutoSpin() {
+  autoSpin = !autoSpin;
+  autoSpinBtn.textContent = autoSpin ? "Stop Auto Spin" : "Auto Spin: OFF";
+  if (autoSpin) autoSpinLoop();
 }
 
-// Event listeners
-spinBtn.addEventListener("click", spin);
-autoSpinBtn.addEventListener("click", toggleAutoSpin);
-
+// Bet change
 betSelect.addEventListener("change", () => {
-  const val = betSelect.value;
-  if (val === "max") {
-    bet = credits;
-  } else {
-    bet = parseInt(val);
-  }
+  bet = betSelect.value === "max" ? credits : parseInt(betSelect.value);
   updateUI();
 });
 
-// Initialize UI
+// Events
+spinBtn.addEventListener("click", spin);
+autoSpinBtn.addEventListener("click", toggleAutoSpin);
+
+// Init
 updateUI();
