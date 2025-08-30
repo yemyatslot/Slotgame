@@ -4,7 +4,94 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Advanced Buffalo Slot Game</title>
-<link rel="stylesheet" href="style.css" />
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #222;
+    color: #fff;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    font-size: 24px;
+    padding: 15px;
+    background: #444;
+    color: #ffcc00;
+  }
+  #info {
+    margin: 15px;
+    font-size: 18px;
+  }
+  #reels {
+    display: flex;
+    justify-content: center;
+    margin: 20px auto;
+    gap: 15px;
+  }
+  .reel {
+    width: 100px;
+    height: 240px;
+    background: #111;
+    border: 2px solid #ffcc00;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(255,255,0,0.5);
+  }
+  .symbols {
+    transition: transform 1s ease-out;
+  }
+  .symbol {
+    font-size: 50px;
+    text-align: center;
+    height: 80px;
+    line-height: 80px;
+  }
+  #controls {
+    margin: 20px;
+  }
+  button, select {
+    padding: 10px 15px;
+    margin: 5px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #444;
+    color: #fff;
+  }
+  #message {
+    margin: 15px;
+    font-size: 20px;
+  }
+  /* Modal */
+  #payoutModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+  }
+  #payoutContent {
+    background: #fff;
+    color: #000;
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+  }
+  #payoutContent ul {
+    text-align: left;
+    padding-left: 20px;
+  }
+  #payoutCloseBtn {
+    margin-top: 10px;
+    padding: 8px 12px;
+  }
+</style>
 </head>
 <body>
 
@@ -12,7 +99,10 @@
 
 <main>
   <div id="info">
-    Credits: <span id="credits">1000</span> | Bet: <span id="bet">10</span> | Wins: <span id="totalWins">0</span> | Spins: <span id="totalSpins">0</span> | RTP: <span id="rtp">0.00%</span>
+    Credits: <span id="credits">1000</span> | 
+    Bet: <span id="bet">10</span> | 
+    Wins: <span id="totalWins">0</span> | 
+    Spins: <span id="totalSpins">0</span>
   </div>
 
   <div id="reels">
@@ -22,12 +112,11 @@
     <div class="reel"><div class="symbols"></div></div>
   </div>
 
-  <div id="message"></div>
+  <div id="message">Press Spin to start!</div>
 
   <div id="controls">
     <button id="spinBtn">Spin</button>
     <button id="autoSpinBtn">Auto Spin: OFF</button>
-
     <select id="betSelect" aria-label="Select Bet">
       <option value="10">Bet: 10</option>
       <option value="20">Bet: 20</option>
@@ -36,9 +125,6 @@
       <option value="200">Bet: 200</option>
       <option value="max">Max Bet</option>
     </select>
-
-    <button id="soundToggleBtn">Sound: ON</button>
-    <button id="payoutBtn">Show Payouts</button>
   </div>
 </main>
 
@@ -65,6 +151,116 @@
 <audio id="soundReelStop" src="https://freesound.org/data/previews/41/41544_512123-lq.mp3" preload="auto"></audio>
 <audio id="soundWin" src="https://freesound.org/data/previews/320/320655_5260875-lq.mp3" preload="auto"></audio>
 
-<script src="game.js"></script>
+<script>
+  // === Slot Machine Game ===
+  const SYMBOLS = ["🦬","🐅","🦅","🦌","🍀","🍎","🔔","⭐"];
+  let credits = 1000;
+  let bet = 10;
+  let autoSpin = false;
+  let totalWins = 0;
+  let totalSpins = 0;
+
+  const creditsEl = document.getElementById("credits");
+  const betEl = document.getElementById("bet");
+  const winsEl = document.getElementById("totalWins");
+  const spinsEl = document.getElementById("totalSpins");
+  const messageEl = document.getElementById("message");
+  const reels = [...document.querySelectorAll("#reels .symbols")];
+  const spinBtn = document.getElementById("spinBtn");
+  const autoSpinBtn = document.getElementById("autoSpinBtn");
+  const betSelect = document.getElementById("betSelect");
+
+  const sSpin = document.getElementById("soundSpin");
+  const sStop = document.getElementById("soundReelStop");
+  const sWin = document.getElementById("soundWin");
+
+  function updateUI() {
+    creditsEl.textContent = credits;
+    betEl.textContent = bet;
+    winsEl.textContent = totalWins;
+    spinsEl.textContent = totalSpins;
+  }
+
+  function showMessage(msg) {
+    messageEl.textContent = msg;
+  }
+
+  function getReel() {
+    return Array.from({ length: 3 }, () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
+  }
+
+  async function spin() {
+    if (credits < bet) {
+      showMessage("❌ Not enough credits!");
+      autoSpin = false;
+      autoSpinBtn.textContent = "Auto Spin: OFF";
+      return;
+    }
+
+    credits -= bet;
+    totalSpins++;
+    updateUI();
+    showMessage("");
+
+    sSpin.currentTime = 0;
+    sSpin.play();
+
+    const result = reels.map(() => getReel());
+
+    for (let i = 0; i < reels.length; i++) {
+      const reelDiv = reels[i];
+      const extended = [...result[i], ...getReel()];
+      reelDiv.style.transition = "none";
+      reelDiv.innerHTML = extended.map(s => `<div class="symbol">${s}</div>`).join("");
+      reelDiv.style.transform = "translateY(-240px)";
+      void reelDiv.offsetWidth;
+      reelDiv.style.transition = "transform 1s ease-out";
+      reelDiv.style.transform = "translateY(-480px)";
+
+      setTimeout(() => {
+        sStop.currentTime = 0;
+        sStop.play();
+      }, i * 400);
+
+      await new Promise(r => setTimeout(r, 1200));
+    }
+
+    const middle = result.map(r => r[1]);
+    if (middle.every(s => s === middle[0])) {
+      const payout = bet * 10;
+      credits += payout;
+      totalWins += payout;
+      updateUI();
+      showMessage(`🎉 JACKPOT! Won ${payout} credits!`);
+      sWin.currentTime = 0;
+      sWin.play();
+    } else {
+      showMessage("Try again!");
+    }
+  }
+
+  async function autoSpinLoop() {
+    while (autoSpin) {
+      await spin();
+      await new Promise(r => setTimeout(r, 1500));
+    }
+  }
+
+  function toggleAutoSpin() {
+    autoSpin = !autoSpin;
+    autoSpinBtn.textContent = autoSpin ? "Stop Auto Spin" : "Auto Spin: OFF";
+    if (autoSpin) autoSpinLoop();
+  }
+
+  betSelect.addEventListener("change", () => {
+    bet = betSelect.value === "max" ? credits : parseInt(betSelect.value);
+    updateUI();
+  });
+
+  spinBtn.addEventListener("click", spin);
+  autoSpinBtn.addEventListener("click", toggleAutoSpin);
+
+  updateUI();
+</script>
 </body>
 </html>
